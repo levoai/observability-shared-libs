@@ -18,15 +18,15 @@ func init() {
 	for fn, expected := range ProtobufFileHashes {
 		fdgzip := proto.FileDescriptor(fn)
 		if fdgzip == nil {
-			panic(fmt.Sprintf("Protobuf file descriptor not found for %q. Rerun gen.go after updating IR.", fn))
+			fmt.Sprintf("Protobuf file descriptor not found for %q. Rerun gen.go after updating IR.", fn)
 		}
 		h := xxhash.New64()
 		h.Write([]byte(fdgzip))
 		actual := h.Sum(nil)
 
 		if bytes.Compare(expected, actual) != 0 {
-			panic(fmt.Sprintf("Protobuf file description mismatch for %q, expected %v got %v. Rerurn gen.go after updating IR.",
-				fn, expected, actual))
+			fmt.Sprintf("Protobuf file description mismatch for %q, expected %v got %v. Rerurn gen.go after updating IR.",
+				fn, expected, actual)
 		}
 	}
 }

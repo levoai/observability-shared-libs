@@ -25,8 +25,8 @@ func init() {
 		actual := h.Sum(nil)
 
 		if bytes.Compare(expected, actual) != 0 {
-			panic(fmt.Sprintf("Protobuf file description mismatch for %q, expected %v got %v. Rerurn gen.go after updating IR.",
-				fn, expected, actual))
+			fmt.Sprintf("Protobuf file description mismatch for %q, expected %v got %v. Rerurn gen.go after updating IR.",
+				fn, expected, actual)
 		}
 	}
 }

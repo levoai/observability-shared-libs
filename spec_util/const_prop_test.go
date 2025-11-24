@@ -6,7 +6,7 @@ import (
 	"github.com/andreyvit/diff"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/akitasoftware/akita-libs/test"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 const (

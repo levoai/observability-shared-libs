@@ -2,7 +2,7 @@ package spec_util
 
 import (
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/spec_util/ir_hash"
+	"github.com/levoai/observability-shared-libs/spec_util/ir_hash"
 )
 
 func OneOf(data []*pb.Data, isConflict bool) (*pb.OneOf, error) {

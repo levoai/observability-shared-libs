@@ -12,7 +12,7 @@ import (
 	"github.com/akitasoftware/go-utils/optionals"
 	"github.com/akitasoftware/go-utils/sets"
 
-	"github.com/akitasoftware/akita-libs/spec_util/ir_hash"
+	"github.com/levoai/observability-shared-libs/spec_util/ir_hash"
 )
 
 type dataAndHash struct {

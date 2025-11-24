@@ -1,12 +1,13 @@
 package akinet
 
 import (
-	"github.com/akitasoftware/akita-libs/buffer_pool"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestConversion(t *testing.T) {

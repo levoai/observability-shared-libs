@@ -3,7 +3,7 @@ package http_rest
 import (
 	"reflect"
 
-	"github.com/akitasoftware/akita-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors"
 )
 
 // Basically a pair of HttpRestSpecVisitorContexts. See that class for more

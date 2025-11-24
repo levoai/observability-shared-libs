@@ -11,9 +11,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/akitasoftware/akita-libs/akid"
-	"github.com/akitasoftware/akita-libs/buffer_pool"
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/akid"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // Represents a generic network traffic that has been parsed from the wire.

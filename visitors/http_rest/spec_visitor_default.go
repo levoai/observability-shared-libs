@@ -4,17 +4,19 @@ import (
 	"fmt"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	. "github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/go_ast"
+	. "github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/go_ast"
 )
 
 // This is the default implementation of VisitNodeChildren for DefaultSpecVisitorImpl.
 // It is indirectly called by every Visit____Children that does not override the default method.
 //
 // We need to call the visitor manager on:
-//   Every exported field in a struct, after updating the context with EnterStruct.
-//   Every element of an array, after updating the context with EnterArray.
-//   Every element of a map, after updating the context with EnterMap.
+//
+//	Every exported field in a struct, after updating the context with EnterStruct.
+//	Every element of an array, after updating the context with EnterArray.
+//	Every element of a map, after updating the context with EnterMap.
+//
 // Each call to visit may abort the operation.
 //
 // This implementation uses reflection as a fallback, but has specialized methods for common types.
@@ -22,7 +24,6 @@ import (
 //
 // It looks like the original implementation would call EnterNode/VisitChildren/LeaveNode on basic types.
 // We won't be doing that, as specVisitor's enter/visitChildren/leave methods do not do anything with them.
-//
 func DefaultVisitIRChildren(ctx Context, vm VisitorManager, m interface{}) Cont {
 	keepGoing := Continue
 

@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/akitasoftware/akita-libs/memview"
 	"github.com/google/martian/v3/har"
+	"github.com/levoai/observability-shared-libs/memview"
 	"github.com/pkg/errors"
 )
 

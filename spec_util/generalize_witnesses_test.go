@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/akitasoftware/akita-libs/test"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 func TestGeneralizeWitness(t *testing.T) {
@@ -45,11 +45,11 @@ func TestGeneralizeWitness(t *testing.T) {
 }
 
 func TestPathRegexps(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		name string
 		path string
 		// Maps concrete path to number of matches (1 + # path parameters)
-		shouldMatch map[string]int
+		shouldMatch    map[string]int
 		shouldNotMatch []string
 	}{
 		{
@@ -64,7 +64,7 @@ func TestPathRegexps(t *testing.T) {
 			name: "two parameters",
 			path: "/v1/{arg1}/foo/{myarg}",
 			shouldMatch: map[string]int{
-				"/v1/x1/foo/x2": 3,
+				"/v1/x1/foo/x2":    3,
 				"/v1/x1.x2/foo/x2": 3,
 			},
 			shouldNotMatch: []string{
@@ -79,7 +79,7 @@ func TestPathRegexps(t *testing.T) {
 			name: "two parameters, trailing slash",
 			path: "/v1/{arg1}/foo/{myarg}/",
 			shouldMatch: map[string]int{
-				"/v1/x1/foo/x2": 3,
+				"/v1/x1/foo/x2":    3,
 				"/v1/x1.x2/foo/x2": 3,
 			},
 			shouldNotMatch: []string{
@@ -94,7 +94,7 @@ func TestPathRegexps(t *testing.T) {
 			name: "no trailing parameter",
 			path: "/v1/{arg1}/foo",
 			shouldMatch: map[string]int{
-				"/v1/x1/foo": 2,
+				"/v1/x1/foo":    2,
 				"/v1/x1.x2/foo": 2,
 			},
 			shouldNotMatch: []string{

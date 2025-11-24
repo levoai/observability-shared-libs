@@ -9,8 +9,8 @@ import (
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
 
-	. "github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/go_ast"
+	. "github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/go_ast"
 )
 
 // VisitorManager that lets you read each message in an APISpec, starting with

@@ -4,8 +4,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/akitasoftware/akita-libs/akid"
-	"github.com/akitasoftware/akita-libs/akinet"
+	"github.com/levoai/observability-shared-libs/akid"
+	"github.com/levoai/observability-shared-libs/akinet"
 )
 
 // Details about a TCP connection that was observed.

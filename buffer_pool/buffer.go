@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // Controls whether representation invariants are checked in buffer.repOk. When

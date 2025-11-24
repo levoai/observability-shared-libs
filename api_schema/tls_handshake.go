@@ -1,8 +1,8 @@
 package api_schema
 
 import (
-	"github.com/akitasoftware/akita-libs/akid"
-	"github.com/akitasoftware/akita-libs/akinet"
+	"github.com/levoai/observability-shared-libs/akid"
+	"github.com/levoai/observability-shared-libs/akinet"
 )
 
 // Details about a TLS handshake that was observed.

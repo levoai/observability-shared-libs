@@ -1,9 +1,9 @@
 package tls
 
 import (
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/memview"
 	"github.com/google/gopacket/reassembly"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // Returns a parser factory for the server half of a TLS connection.

@@ -6,8 +6,8 @@ import (
 	"runtime"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	. "github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/go_ast_pair"
+	. "github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/go_ast_pair"
 )
 
 // A PairVisitorManager that lets you read each message in a pair of APISpecs,

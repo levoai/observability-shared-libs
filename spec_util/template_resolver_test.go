@@ -6,7 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/testing/protocmp"
 
-	"github.com/akitasoftware/akita-libs/test"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 func TestExtractValueFromTemplate(t *testing.T) {

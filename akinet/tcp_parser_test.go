@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/gopacket/reassembly"
 
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 type testFactory struct {

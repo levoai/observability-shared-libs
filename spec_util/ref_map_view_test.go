@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/test"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 const (

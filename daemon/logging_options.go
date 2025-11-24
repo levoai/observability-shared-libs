@@ -1,6 +1,6 @@
 package daemon
 
-import "github.com/akitasoftware/akita-libs/akid"
+import "github.com/levoai/observability-shared-libs/akid"
 
 type LoggingOptions struct {
 	// The trace to which logged events should be associated.

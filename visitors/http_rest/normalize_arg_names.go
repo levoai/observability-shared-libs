@@ -9,8 +9,8 @@ import (
 	"github.com/golang/glog"
 	"github.com/pkg/errors"
 
-	. "github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/go_ast"
+	. "github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/go_ast"
 )
 
 // Represents the "name" of an argument to a method.

@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/spec_util/ir_hash"
+	"github.com/levoai/observability-shared-libs/spec_util/ir_hash"
 )
 
 func GetPathRegexps(spec *pb.APISpec) map[*regexp.Regexp]string {

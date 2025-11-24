@@ -9,9 +9,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
 
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/buffer_pool"
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 var (
@@ -141,6 +141,83 @@ func TestAJPResponseParser(t *testing.T) {
 	}
 }
 
+func TestAJPResponseParserEOFWithoutEnd(t *testing.T) {
+	pool, err := buffer_pool.MakeBufferPool(1024*1024, 4*1024)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sendHeaders := buildSendHeadersNoContentLength()
+	body := buildBodyChunk([]byte("short"))
+	stream := append(sendHeaders, body...)
+
+	parser := newAJPParser(false, testBidiID, 500, 700, pool)
+	result, unused, consumed, err := parser.Parse(memview.New(stream), true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if unused.Len() != 0 {
+		t.Fatalf("expected no unused bytes, got %d", unused.Len())
+	}
+
+	resp, ok := result.(akinet.HTTPResponse)
+	if !ok {
+		t.Fatalf("expected HTTPResponse, got %T", result)
+	}
+	defer resp.ReleaseBuffers()
+
+	expected := akinet.HTTPResponse{
+		StreamID:   uuid.UUID(testBidiID),
+		Seq:        500,
+		StatusCode: 200,
+		ProtoMajor: 1,
+		ProtoMinor: 1,
+		Header: http.Header{
+			"Content-Type": {"text/plain"},
+			"Set-Cookie":   {"id=456"},
+		},
+		Cookies: []*http.Cookie{
+			{Name: "id", Value: "456", Raw: "id=456"},
+		},
+		Body: memview.New([]byte("short")),
+	}
+
+	if diff := cmp.Diff(expected, resp, cmpopts.IgnoreUnexported(akinet.HTTPResponse{}), cmpopts.EquateEmpty()); diff != "" {
+		t.Fatalf("response diff (-want +got):\n%s", diff)
+	}
+	if consumed != int64(len(stream)) {
+		t.Fatalf("expected %d bytes consumed, got %d", len(stream), consumed)
+	}
+}
+
+func TestAJPResponseParserAsciiMagic(t *testing.T) {
+	pool, err := buffer_pool.MakeBufferPool(1024*1024, 4*1024)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sendHeaders := setMagic(buildSendHeaders(), ajpAsciiMagic)
+	body := setMagic(buildBodyChunk([]byte("hi")), ajpAsciiMagic)
+	endResp := setMagic(buildEndResponse(), ajpAsciiMagic)
+	stream := append(append(sendHeaders, body...), endResp...)
+
+	parser := newAJPParser(false, testBidiID, 301, 800, pool)
+	result, _, _, err := parser.Parse(memview.New(stream), true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	resp, ok := result.(akinet.HTTPResponse)
+	if !ok {
+		t.Fatalf("expected HTTPResponse, got %T", result)
+	}
+	defer resp.ReleaseBuffers()
+
+	if resp.StatusCode != 200 || resp.Body.String() != "hi" {
+		t.Fatalf("unexpected response %+v", resp)
+	}
+}
+
 func TestAJPFactoryAccept(t *testing.T) {
 	pool, err := buffer_pool.MakeBufferPool(1024*1024, 4*1024)
 	if err != nil {
@@ -176,6 +253,11 @@ func TestAJPFactoryAccept(t *testing.T) {
 	cpingMem := memview.New(cpingStream)
 	if decision, discard := reqFactory.Accepts(cpingMem, false); decision != akinet.Accept || discard != int64(len(cping)) {
 		t.Fatalf("expected accept after skipping CPing, got %v discard=%d", decision, discard)
+	}
+
+	asciiSendHeaders := memview.New(setMagic(buildSendHeaders(), ajpAsciiMagic))
+	if decision, discard := respFactory.Accepts(asciiSendHeaders, false); decision != akinet.Accept || discard != 0 {
+		t.Fatalf("response factory should accept ascii magic, got %v discard=%d", decision, discard)
 	}
 }
 
@@ -238,6 +320,19 @@ func buildSendHeaders() []byte {
 	return buildAjpMessage(ajpSendHeadersType, payload)
 }
 
+func buildSendHeadersNoContentLength() []byte {
+	payload := ajpUint16(200)
+	payload = append(payload, ajpStringBytes("OK")...)
+	payload = append(payload, ajpUint16(2)...) // headers
+	// Content-Type
+	payload = append(payload, ajpUint16(0xA001)...)
+	payload = append(payload, ajpStringBytes("text/plain")...)
+	// Set-Cookie
+	payload = append(payload, ajpUint16(0xA007)...)
+	payload = append(payload, ajpStringBytes("id=456")...)
+	return buildAjpMessage(ajpSendHeadersType, payload)
+}
+
 func buildEndResponse() []byte {
 	return buildAjpMessage(ajpEndResponseType, []byte{0x01})
 }
@@ -269,4 +364,14 @@ func ajpStringBytes(s string) []byte {
 
 func ajpUint16(v int) []byte {
 	return []byte{byte(v >> 8), byte(v)}
+}
+
+func setMagic(msg []byte, magic []byte) []byte {
+	if len(msg) < 2 {
+		return msg
+	}
+	cp := make([]byte, len(msg))
+	copy(cp, msg)
+	copy(cp[:2], magic)
+	return cp
 }

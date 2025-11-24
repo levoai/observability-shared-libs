@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/akitasoftware/akita-libs/buffer_pool"
 	"github.com/akitasoftware/go-utils/sets"
 	"github.com/akitasoftware/go-utils/slices"
 	"github.com/google/uuid"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
 )
 
 func FromStdRequest(streamID uuid.UUID, seq int, src *http.Request, body buffer_pool.Buffer) HTTPRequest {

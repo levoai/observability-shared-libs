@@ -1,9 +1,9 @@
 package http2
 
 import (
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/memview"
 	"github.com/google/gopacket/reassembly"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // This parser only recognizes HTTP/2 connection prefaces.

@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors"
 )
 
 // Describes which part of an HTTP request/response a value belongs to.

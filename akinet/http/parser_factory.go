@@ -4,9 +4,9 @@ import (
 	"github.com/golang/glog"
 	"github.com/google/gopacket/reassembly"
 
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/buffer_pool"
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // Returns a factory for creating HTTP requests whose bodies will be allocated

@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/akitasoftware/akita-libs/memview"
 	"github.com/google/go-cmp/cmp"
+	"github.com/levoai/observability-shared-libs/memview"
 	"github.com/stretchr/testify/assert"
 )
 

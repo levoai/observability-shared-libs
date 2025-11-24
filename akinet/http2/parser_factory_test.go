@@ -3,8 +3,8 @@ package http2
 import (
 	"testing"
 
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // TODO: the nice "segment" utility from http/1 tests is not exported,

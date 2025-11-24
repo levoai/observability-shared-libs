@@ -9,12 +9,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/golang/glog"
 	"github.com/google/gopacket/reassembly"
 	"github.com/google/uuid"
 
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/buffer_pool"
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 const (
@@ -26,8 +27,6 @@ const (
 	ajpCPongReplyType     byte = 0x09
 	ajpCPingRequestType   byte = 0x0A
 )
-
-var ajpMagic = []byte{0x12, 0x34}
 
 var ajpMethodCodes = map[byte]string{
 	0x01: http.MethodOptions,
@@ -154,6 +153,15 @@ func (p *ajpParser) Parse(input memview.MemView, isEnd bool) (result akinet.Pars
 	p.allInput.Append(input)
 	totalBytesConsumed = p.allInput.Len()
 
+	// p.logf("received %d bytes (isEnd=%t)", input.Len(), isEnd)
+
+	defer func() {
+		if err != nil {
+			p.releaseBody()
+			// p.logf("parse failed: %v", err)
+		}
+	}()
+
 	var consumed int64
 	if p.isRequest {
 		result, err = p.parseRequest()
@@ -161,22 +169,29 @@ func (p *ajpParser) Parse(input memview.MemView, isEnd bool) (result akinet.Pars
 		result, err = p.parseResponse()
 	}
 
-	if err != nil {
-		p.releaseBody()
-		return nil, memview.MemView{}, totalBytesConsumed, err
-	}
-
 	if result == nil {
 		if isEnd {
-			p.releaseBody()
-			return nil, memview.MemView{}, totalBytesConsumed, fmt.Errorf("incomplete AJP %s", p.nameSuffix())
+			result, err = p.finalizeOnEOF()
+			if err != nil {
+				// p.logf("finalize on EOF failed: %v", err)
+				return nil, memview.MemView{}, totalBytesConsumed, err
+			}
+			if result == nil {
+				// p.logf("finalize on EOF produced no result")
+				return nil, memview.MemView{}, totalBytesConsumed, fmt.Errorf("incomplete AJP %s", p.nameSuffix())
+			}
+		} else {
+			return nil, memview.MemView{}, totalBytesConsumed, nil
 		}
-		return nil, memview.MemView{}, totalBytesConsumed, nil
 	}
 
 	consumed = p.bytesParsed
 	unused = p.allInput.SubView(consumed, p.allInput.Len())
 	totalBytesConsumed -= unused.Len()
+
+	// if result != nil {
+	// 	p.logf("emitted %T consuming %d bytes (unused=%d)", result, totalBytesConsumed, unused.Len())
+	// }
 
 	return result, unused, totalBytesConsumed, nil
 }
@@ -254,6 +269,7 @@ func (p *ajpParser) parseResponse() (akinet.ParsedNetworkContent, error) {
 
 		switch msg.msgType {
 		case ajpSendHeadersType:
+			// p.logf("response: SEND_HEADERS (%d bytes)", msg.payload.Len())
 			if err := state.consumeSendHeaders(msg.payload); err != nil {
 				return nil, err
 			}
@@ -262,13 +278,17 @@ func (p *ajpParser) parseResponse() (akinet.ParsedNetworkContent, error) {
 			if err != nil {
 				return nil, err
 			}
+			// p.logf("response: SEND_BODY_CHUNK length=%d", chunkLen)
 			state.noteBodyChunk(chunkLen)
 		case ajpEndResponseType:
+			// p.logf("response: END_RESPONSE")
 			state.markEnd()
 		case ajpGetBodyChunkType:
 			// This is the server requesting additional request body bytes. Ignore.
+			// p.logf("response: GET_BODY_CHUNK passthrough")
 		case ajpCPingRequestType, ajpCPongReplyType:
 			// Ignore connection keepalive messages.
+			// p.logf("response: keepalive msgType=0x%x", msg.msgType)
 		case ajpForwardRequestType:
 			return nil, fmt.Errorf("unexpected FORWARD_REQUEST on response stream")
 		default:
@@ -299,7 +319,7 @@ func (p *ajpParser) nextMessage() (msg ajpMessage, needMore bool, err error) {
 		return ajpMessage{}, true, nil
 	}
 
-	if p.allInput.GetByte(start) != ajpMagic[0] || p.allInput.GetByte(start+1) != ajpMagic[1] {
+	if !matchAJPMagicAt(p.allInput, start) {
 		return ajpMessage{}, false, fmt.Errorf("invalid AJP magic at offset %d", start)
 	}
 
@@ -326,6 +346,7 @@ func (p *ajpParser) nextMessage() (msg ajpMessage, needMore bool, err error) {
 
 func (p *ajpParser) appendBodyChunk(payload memview.MemView) (int, error) {
 	if payload.Len() < 2 {
+		// p.logf("malformed body chunk: len=%d", payload.Len())
 		return 0, fmt.Errorf("malformed body chunk: missing length")
 	}
 	chunkLen := int(payload.GetUint16(0))
@@ -347,6 +368,39 @@ func (p *ajpParser) releaseBody() {
 		p.buffer.Release()
 		p.buffer = nil
 	}
+}
+
+func (p *ajpParser) finalizeOnEOF() (akinet.ParsedNetworkContent, error) {
+	// p.logf("finalizing on EOF")
+	if p.isRequest {
+		state := p.reqState
+		if state == nil || !state.forwardSeen {
+			// p.logf("no forward request state to finalize")
+			return nil, nil
+		}
+		state.bodyDone = true
+		req, err := state.toHTTPRequest(p.buffer)
+		if err != nil {
+			return nil, err
+		}
+		result := akinet.FromStdRequest(uuid.UUID(p.bidiID), int(p.ack), req, p.buffer)
+		p.buffer = nil
+		return result, nil
+	}
+
+	state := p.respState
+	if state == nil || !state.gotHeaders {
+		// p.logf("no response headers to finalize")
+		return nil, nil
+	}
+	state.markEnd()
+	resp, err := state.toHTTPResponse(p.buffer)
+	if err != nil {
+		return nil, err
+	}
+	result := akinet.FromStdResponse(uuid.UUID(p.bidiID), int(p.seq), resp, p.buffer)
+	p.buffer = nil
+	return result, nil
 }
 
 type ajpRequestState struct {
@@ -828,4 +882,10 @@ func attrName(code byte) string {
 	default:
 		return fmt.Sprintf("attr-0x%x", code)
 	}
+}
+
+func (p *ajpParser) logf(format string, args ...interface{}) {
+	streamID := uuid.UUID(p.bidiID)
+	prefix := fmt.Sprintf("AJP %s parser [%s]: ", p.nameSuffix(), streamID)
+	glog.Infof(prefix+format, args...)
 }

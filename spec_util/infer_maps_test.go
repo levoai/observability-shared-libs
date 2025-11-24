@@ -3,9 +3,9 @@ package spec_util
 import (
 	"testing"
 
-	"github.com/akitasoftware/akita-libs/test"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 func TestInferMaps(t *testing.T) {

@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/test"
+	"github.com/levoai/observability-shared-libs/test"
 
-	. "github.com/akitasoftware/akita-libs/visitors"
+	. "github.com/levoai/observability-shared-libs/visitors"
 )
 
 /* You can extend DefaultHttpRestSpecVisitor with a custom reader that

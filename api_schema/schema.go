@@ -3,13 +3,13 @@ package api_schema
 import (
 	"time"
 
-	"github.com/akitasoftware/akita-libs/akid"
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/client_telemetry"
-	"github.com/akitasoftware/akita-libs/endpoints"
-	"github.com/akitasoftware/akita-libs/http_rest_methods"
-	"github.com/akitasoftware/akita-libs/tags"
-	"github.com/akitasoftware/akita-libs/time_span"
+	"github.com/levoai/observability-shared-libs/akid"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/client_telemetry"
+	"github.com/levoai/observability-shared-libs/endpoints"
+	"github.com/levoai/observability-shared-libs/http_rest_methods"
+	"github.com/levoai/observability-shared-libs/tags"
+	"github.com/levoai/observability-shared-libs/time_span"
 )
 
 // NetworkDirection is always relative to subject service.

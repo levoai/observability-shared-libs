@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/akitasoftware/akita-libs/visitors"
+	. "github.com/levoai/observability-shared-libs/visitors"
 )
 
 type Counter struct {

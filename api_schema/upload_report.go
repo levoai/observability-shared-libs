@@ -1,6 +1,6 @@
 package api_schema
 
-import "github.com/akitasoftware/akita-libs/akid"
+import "github.com/levoai/observability-shared-libs/akid"
 
 type UploadReportsRequest struct {
 	ClientID       akid.ClientID          `json:"client_id"`

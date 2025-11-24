@@ -6,10 +6,10 @@ import (
 	"sort"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/spec_util"
-	. "github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/go_ast_pair"
-	"github.com/akitasoftware/akita-libs/visitors/http_rest"
+	"github.com/levoai/observability-shared-libs/spec_util"
+	. "github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/go_ast_pair"
+	"github.com/levoai/observability-shared-libs/visitors/http_rest"
 	"golang.org/x/exp/maps"
 )
 

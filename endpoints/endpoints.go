@@ -1,6 +1,6 @@
 package endpoints
 
-import "github.com/akitasoftware/akita-libs/http_rest_methods"
+import "github.com/levoai/observability-shared-libs/http_rest_methods"
 
 // An endpoint whose host and path template have not been normalized.
 type Endpoint struct {

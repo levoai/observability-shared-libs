@@ -3,8 +3,8 @@ package http_rest
 import (
 	"github.com/akitasoftware/akita-ir/go/api_spec"
 
-	"github.com/akitasoftware/akita-libs/spec_util/ir_hash"
-	. "github.com/akitasoftware/akita-libs/visitors"
+	"github.com/levoai/observability-shared-libs/spec_util/ir_hash"
+	. "github.com/levoai/observability-shared-libs/visitors"
 )
 
 // An abstract contextless visitor for recomputing node hashes while walking

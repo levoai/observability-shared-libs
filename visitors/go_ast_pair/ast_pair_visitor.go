@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	. "github.com/akitasoftware/akita-libs/visitors"
+	. "github.com/levoai/observability-shared-libs/visitors"
 )
 
 // Structurally recurses through `leftNode` and `rightNode` in tandem.

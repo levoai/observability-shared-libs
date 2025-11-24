@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/akitasoftware/akita-libs/tags"
+	"github.com/levoai/observability-shared-libs/tags"
 )
 
 type VersionName = string

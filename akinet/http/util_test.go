@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 var (

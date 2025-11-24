@@ -2,8 +2,8 @@ package http_rest_diff
 
 import (
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	. "github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/http_rest"
+	. "github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/http_rest"
 )
 
 // Determines whether diffing between two Data instances will produce an empty

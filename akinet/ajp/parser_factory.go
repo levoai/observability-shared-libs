@@ -3,9 +3,9 @@ package ajp
 import (
 	"github.com/google/gopacket/reassembly"
 
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/buffer_pool"
-	"github.com/akitasoftware/akita-libs/memview"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/buffer_pool"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 // Returns a factory for parsing AJP requests (web server -> app server).
@@ -27,7 +27,7 @@ func (f ajpRequestParserFactory) Name() string {
 }
 
 func (f ajpRequestParserFactory) Accepts(input memview.MemView, isEnd bool) (akinet.AcceptDecision, int64) {
-	return acceptAJP(input, isEnd, ajpRequestEntryTypes)
+	return acceptAJP(input, isEnd, ajpRequestEntryTypes, "request")
 }
 
 func (f ajpRequestParserFactory) CreateParser(id akinet.TCPBidiID, seq, ack reassembly.Sequence) akinet.TCPParser {
@@ -43,7 +43,7 @@ func (f ajpResponseParserFactory) Name() string {
 }
 
 func (f ajpResponseParserFactory) Accepts(input memview.MemView, isEnd bool) (akinet.AcceptDecision, int64) {
-	return acceptAJP(input, isEnd, ajpResponseEntryTypes)
+	return acceptAJP(input, isEnd, ajpResponseEntryTypes, "response")
 }
 
 func (f ajpResponseParserFactory) CreateParser(id akinet.TCPBidiID, seq, ack reassembly.Sequence) akinet.TCPParser {
@@ -61,38 +61,39 @@ var ajpResponseEntryTypes = map[byte]struct{}{
 	ajpEndResponseType:   {},
 }
 
-func acceptAJP(input memview.MemView, isEnd bool, allowed map[byte]struct{}) (akinet.AcceptDecision, int64) {
+func acceptAJP(input memview.MemView, isEnd bool, allowed map[byte]struct{}, role string) (akinet.AcceptDecision, int64) {
 	searchStart := int64(0)
 
 	for {
-		if input.Len()-searchStart < int64(len(ajpMagic)) {
+		if input.Len()-searchStart < 2 {
 			if isEnd {
 				return akinet.Reject, input.Len()
 			}
 			return akinet.NeedMoreData, searchStart
 		}
 
-		idx := input.Index(searchStart, ajpMagic)
+		idx, magic := findAJPMagic(input, searchStart)
 		if idx < 0 {
 			if isEnd {
 				return akinet.Reject, input.Len()
 			}
 			// Preserve a potential partial prefix at the end.
-			if input.Len()-searchStart == 1 && input.GetByte(input.Len()-1) == ajpMagic[0] {
+			if hasPartialAJPMagic(input, searchStart) {
 				return akinet.NeedMoreData, input.Len() - 1
 			}
 			return akinet.NeedMoreData, searchStart
 		}
 
-		if input.Len() < idx+4 {
+		headerLen := int64(len(magic)) + 2
+		if input.Len() < idx+headerLen {
 			if isEnd {
 				return akinet.Reject, input.Len()
 			}
 			return akinet.NeedMoreData, idx
 		}
 
-		length := int64(input.GetUint16(idx + 2))
-		total := idx + 4 + length
+		length := int64(input.GetUint16(idx + int64(len(magic))))
+		total := idx + headerLen + length
 		if input.Len() < total {
 			if isEnd {
 				return akinet.Reject, input.Len()
@@ -100,12 +101,14 @@ func acceptAJP(input memview.MemView, isEnd bool, allowed map[byte]struct{}) (ak
 			return akinet.NeedMoreData, idx
 		}
 
-		msgType := input.GetByte(idx + 4)
+		msgType := input.GetByte(idx + int64(len(magic)) + 2)
 		if _, ok := allowed[msgType]; ok {
+			// glog.Infof("AJP %s factory accepting message type 0x%x at offset %d (len=%d)", role, msgType, idx, length)
 			return akinet.Accept, idx
 		}
 
 		// Skip this message and continue scanning.
+		// glog.Infof("AJP %s factory skipping unsupported message type 0x%x (len=%d)", role, msgType, length)
 		searchStart = total
 		if searchStart >= input.Len() {
 			if isEnd {

@@ -4,7 +4,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/akitasoftware/akita-libs/akid"
+	"github.com/levoai/observability-shared-libs/akid"
 )
 
 type WitnessReport struct {

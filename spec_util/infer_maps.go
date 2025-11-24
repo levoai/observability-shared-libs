@@ -4,8 +4,8 @@ import (
 	"regexp"
 
 	pb "github.com/akitasoftware/akita-ir/go/api_spec"
-	"github.com/akitasoftware/akita-libs/visitors"
-	"github.com/akitasoftware/akita-libs/visitors/http_rest"
+	"github.com/levoai/observability-shared-libs/visitors"
+	"github.com/levoai/observability-shared-libs/visitors/http_rest"
 )
 
 // The maximum number of optional fields a struct can have before it's inferred

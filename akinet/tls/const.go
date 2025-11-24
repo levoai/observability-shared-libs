@@ -1,6 +1,6 @@
 package tls
 
-import "github.com/akitasoftware/akita-libs/akinet"
+import "github.com/levoai/observability-shared-libs/akinet"
 
 const (
 	// Minimum number of bytes needed before we can determine whether we can

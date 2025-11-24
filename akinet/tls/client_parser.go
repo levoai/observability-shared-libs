@@ -4,10 +4,10 @@ import (
 	"errors"
 	"io"
 
-	"github.com/akitasoftware/akita-libs/akid"
-	"github.com/akitasoftware/akita-libs/akinet"
-	"github.com/akitasoftware/akita-libs/memview"
 	"github.com/google/uuid"
+	"github.com/levoai/observability-shared-libs/akid"
+	"github.com/levoai/observability-shared-libs/akinet"
+	"github.com/levoai/observability-shared-libs/memview"
 )
 
 func newTLSClientHelloParser(bidiID akinet.TCPBidiID) *tlsClientHelloParser {

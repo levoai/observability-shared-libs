@@ -3,7 +3,7 @@ package http_rest
 import (
 	"testing"
 
-	"github.com/akitasoftware/akita-libs/test"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 func TestNormalizeNames(t *testing.T) {

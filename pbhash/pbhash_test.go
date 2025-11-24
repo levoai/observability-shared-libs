@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/akitasoftware/akita-libs/test"
 	protohash "github.com/akitasoftware/objecthash-proto"
+	"github.com/levoai/observability-shared-libs/test"
 )
 
 func TestHash(t *testing.T) {
